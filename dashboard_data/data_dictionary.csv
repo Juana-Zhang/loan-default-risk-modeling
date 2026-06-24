@@ -1,0 +1,9 @@
+file,description
+overview_metrics.csv,High-level dataset and model KPI cards for dashboard overview.
+target_distribution.csv,Aggregate target class counts and shares.
+numeric_correlations.csv,Feature-level Pearson correlation with loan_status.
+segment_default_rates.csv,Aggregate default rates by categorical segment.
+binned_numeric_default_rates.csv,Aggregate default rates by numeric feature buckets; no borrower-level rows.
+model_cv_comparison.csv,Cross-validated model comparison metrics.
+final_model_metrics.csv,OOF threshold tuning and final holdout test metrics.
+feature_importance.csv,Permutation importance for final model interpretation.

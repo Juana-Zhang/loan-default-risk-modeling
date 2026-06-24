@@ -1,0 +1,3 @@
+loan_status,count,share,loan_status_label
+0,50295,0.8576178702361668,Non-default
+1,8350,0.14238212976383324,Default

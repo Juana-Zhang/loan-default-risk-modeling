@@ -1,0 +1,8 @@
+feature,correlation_to_default,direction
+loan_percent_income,0.37828,Positive
+loan_int_rate,0.338948,Positive
+person_income,-0.169956,Negative
+loan_amnt,0.144982,Positive
+person_emp_length,-0.100428,Negative
+cb_person_cred_hist_length,-0.00303,Negative
+person_age,-0.00113,Negative

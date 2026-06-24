@@ -1,0 +1,9 @@
+metric,value,display_value,section
+Records analyzed,58645.0,"58,645",Dataset
+Observed default rate,0.14238212976383324,14.24%,Dataset
+Default observations,8350.0,"8,350",Dataset
+Selected model,,Gradient Boosting,Model
+Test ROC-AUC,0.9538018505190633,0.954,Model
+Test PR-AUC,0.8720887394369341,0.872,Model
+Tuned test F1,0.807845744680851,0.808,Model
+Tuned threshold,0.41684857369097816,0.417,Model
