@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Loan Default Risk Dashboard</title>
+  <style>
+    :root {
+      --navy: #15324d;
+      --ink: #1f2937;
+      --muted: #667085;
+      --line: #d9e2ec;
+      --soft: #f3f7fb;
+      --blue: #4c78a8;
+      --orange: #f28e2b;
+      --green: #54a24b;
+      --red: #b44747;
+      --bg: #f7f9fc;
+      --white: #fff;
+      --shadow: 0 14px 35px rgba(21, 50, 77, .08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+    .page {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: 1.4fr .9fr;
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 24px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      color: var(--navy);
+      font-size: clamp(30px, 5vw, 52px);
+      letter-spacing: 0;
+      line-height: 1.02;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.55;
+      max-width: 760px;
+    }
+    .badge {
+      justify-self: end;
+      background: #eaf2fb;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 14px 16px;
+      color: var(--navy);
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 320px;
+    }
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+    .kpis {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-bottom: 18px;
+    }
+    .card {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+      min-width: 0;
+    }
+    .kpi-value {
+      color: var(--navy);
+      font-size: 30px;
+      line-height: 1;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .kpi-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .kpi-section {
+      margin-top: 5px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .two-col {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+    .wide {
+      grid-column: 1 / -1;
+    }
+    h2 {
+      margin: 0 0 4px;
+      color: var(--navy);
+      font-size: 20px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+    .section-note {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .chart {
+      display: grid;
+      gap: 10px;
+      min-height: 160px;
+    }
+    .bar-row {
+      display: grid;
+      grid-template-columns: 145px 1fr 74px;
+      gap: 10px;
+      align-items: center;
+      font-size: 12px;
+    }
+    .label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--ink);
+    }
+    .track {
+      height: 18px;
+      background: #edf2f7;
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+    .bar {
+      height: 100%;
+      border-radius: 999px;
+      background: var(--blue);
+      min-width: 2px;
+    }
+    .bar.orange { background: var(--orange); }
+    .bar.green { background: var(--green); }
+    .bar.red { background: var(--red); }
+    .value {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      color: var(--muted);
+    }
+    .legend {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 10px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      display: inline-block;
+      border-radius: 50%;
+      margin-right: 5px;
+      background: var(--blue);
+    }
+    .dot.orange { background: var(--orange); }
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 14px;
+    }
+    button {
+      border: 1px solid var(--line);
+      background: var(--white);
+      color: var(--navy);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    button.active {
+      background: var(--navy);
+      color: var(--white);
+      border-color: var(--navy);
+    }
+    .model-row {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .dual {
+      display: grid;
+      gap: 5px;
+    }
+    .mini-line {
+      display: grid;
+      grid-template-columns: 72px 1fr 46px;
+      gap: 8px;
+      align-items: center;
+      font-size: 12px;
+    }
+    .callout {
+      background: #eaf2fb;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px 16px;
+      color: var(--navy);
+      font-weight: 700;
+      line-height: 1.45;
+    }
+    .footer {
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    @media (max-width: 850px) {
+      header, .two-col, .kpis { grid-template-columns: 1fr; }
+      .badge { justify-self: stretch; }
+      .bar-row { grid-template-columns: 120px 1fr 64px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <div>
+        <h1>Loan Default Risk Dashboard</h1>
+        <div class="subtitle">Portfolio dashboard built from aggregated loan-risk modeling outputs. It translates EDA, model selection, and final performance into business-facing risk signals.</div>
+      </div>
+      <div class="badge">Public-safe dashboard data only<br><span style="font-weight:500">No borrower-level records or raw dataset included.</span></div>
+    </header>
+
+    <section class="grid kpis" id="kpis"></section>
+
+    <section class="grid two-col">
+      <div class="card">
+        <h2>Target Distribution</h2>
+        <p class="section-note">Defaults are a minority class, so accuracy alone is not enough.</p>
+        <div class="chart" id="targetChart"></div>
+      </div>
+      <div class="card">
+        <h2>Numerical Risk Signals</h2>
+        <p class="section-note">Affordability and pricing are the strongest numerical signals.</p>
+        <div class="chart" id="corrChart"></div>
+      </div>
+      <div class="card wide">
+        <h2>Segment-Level Risk</h2>
+        <p class="section-note">Use the filter buttons to compare default rates across categorical borrower and loan segments.</p>
+        <div class="tabs" id="segmentTabs"></div>
+        <div class="chart" id="segmentChart"></div>
+      </div>
+      <div class="card">
+        <h2>Model Comparison</h2>
+        <p class="section-note">Gradient Boosting is selected by cross-validated PR-AUC.</p>
+        <div id="modelChart"></div>
+        <div class="legend"><span><i class="dot"></i>CV ROC-AUC</span><span><i class="dot orange"></i>CV PR-AUC</span></div>
+      </div>
+      <div class="card">
+        <h2>Top Predictive Drivers</h2>
+        <p class="section-note">Permutation importance aligns with EDA: repayment burden, pricing, housing stability, and income.</p>
+        <div class="chart" id="importanceChart"></div>
+      </div>
+      <div class="card wide">
+        <h2>Final Test Readout</h2>
+        <p class="section-note">The selected model is evaluated once on the untouched holdout test set after threshold tuning.</p>
+        <div class="grid kpis" id="finalKpis"></div>
+        <div class="callout" id="finalCallout"></div>
+      </div>
+    </section>
+
+    <div class="footer">Prepared by Juana Zhang. Dashboard uses aggregated CSV tables from the portfolio repository's <code>dashboard_data</code> folder.</div>
+  </main>
+
+  <script>
+    const DATA = {"overview": [{"metric": "Records analyzed", "value": 58645.0, "display_value": "58,645", "section": "Dataset"}, {"metric": "Observed default rate", "value": 0.1423821297638332, "display_value": "14.24%", "section": "Dataset"}, {"metric": "Default observations", "value": 8350.0, "display_value": "8,350", "section": "Dataset"}, {"metric": "Selected model", "value": NaN, "display_value": "Gradient Boosting", "section": "Model"}, {"metric": "Test ROC-AUC", "value": 0.9538018505190632, "display_value": "0.954", "section": "Model"}, {"metric": "Test PR-AUC", "value": 0.8720887394369341, "display_value": "0.872", "section": "Model"}, {"metric": "Tuned test F1", "value": 0.807845744680851, "display_value": "0.808", "section": "Model"}, {"metric": "Tuned threshold", "value": 0.4168485736909781, "display_value": "0.417", "section": "Model"}], "target": [{"loan_status": 0, "count": 50295, "share": 0.8576178702361668, "loan_status_label": "Non-default"}, {"loan_status": 1, "count": 8350, "share": 0.1423821297638332, "loan_status_label": "Default"}], "correlations": [{"feature": "loan_percent_income", "correlation_to_default": 0.37828, "direction": "Positive"}, {"feature": "loan_int_rate", "correlation_to_default": 0.338948, "direction": "Positive"}, {"feature": "person_income", "correlation_to_default": -0.169956, "direction": "Negative"}, {"feature": "loan_amnt", "correlation_to_default": 0.144982, "direction": "Positive"}, {"feature": "person_emp_length", "correlation_to_default": -0.100428, "direction": "Negative"}, {"feature": "cb_person_cred_hist_length", "correlation_to_default": -0.00303, "direction": "Negative"}, {"feature": "person_age", "correlation_to_default": -0.00113, "direction": "Negative"}], "segments": [{"dimension": "loan_grade", "segment": "G", "count": 33, "default_count": 27, "non_default_count": 6, "default_rate": 0.8181818181818182}, {"dimension": "loan_grade", "segment": "E", "count": 1009, "default_count": 631, "non_default_count": 378, "default_rate": 0.6253716551040635}, {"dimension": "loan_grade", "segment": "F", "count": 149, "default_count": 91, "non_default_count": 58, "default_rate": 0.610738255033557}, {"dimension": "loan_grade", "segment": "D", "count": 5034, "default_count": 2988, "non_default_count": 2046, "default_rate": 0.5935637663885578}, {"dimension": "loan_grade", "segment": "C", "count": 11036, "default_count": 1494, "non_default_count": 9542, "default_rate": 0.1353751359188111}, {"dimension": "loan_grade", "segment": "B", "count": 20400, "default_count": 2087, "non_default_count": 18313, "default_rate": 0.1023039215686274}, {"dimension": "loan_grade", "segment": "A", "count": 20984, "default_count": 1032, "non_default_count": 19952, "default_rate": 0.0491803278688524}, {"dimension": "person_home_ownership", "segment": "RENT", "count": 30594, "default_count": 6809, "non_default_count": 23785, "default_rate": 0.2225599790808655}, {"dimension": "person_home_ownership", "segment": "OTHER", "count": 89, "default_count": 15, "non_default_count": 74, "default_rate": 0.1685393258426966}, {"dimension": "person_home_ownership", "segment": "MORTGAGE", "count": 24824, "default_count": 1483, "non_default_count": 23341, "default_rate": 0.0597405736384144}, {"dimension": "person_home_ownership", "segment": "OWN", "count": 3138, "default_count": 43, "non_default_count": 3095, "default_rate": 0.0137029955385595}, {"dimension": "loan_intent", "segment": "DEBTCONSOLIDATION", "count": 9133, "default_count": 1729, "non_default_count": 7404, "default_rate": 0.1893134785941092}, {"dimension": "loan_intent", "segment": "MEDICAL", "count": 10934, "default_count": 1949, "non_default_count": 8985, "default_rate": 0.17825132613865}, {"dimension": "loan_intent", "segment": "HOMEIMPROVEMENT", "count": 6280, "default_count": 1091, "non_default_count": 5189, "default_rate": 0.1737261146496815}, {"dimension": "loan_intent", "segment": "PERSONAL", "count": 10016, "default_count": 1330, "non_default_count": 8686, "default_rate": 0.1327875399361022}, {"dimension": "loan_intent", "segment": "EDUCATION", "count": 12271, "default_count": 1322, "non_default_count": 10949, "default_rate": 0.1077336810365903}, {"dimension": "loan_intent", "segment": "VENTURE", "count": 10011, "default_count": 929, "non_default_count": 9082, "default_rate": 0.0927979222854859}, {"dimension": "cb_person_default_on_file", "segment": "Y", "count": 8702, "default_count": 2601, "non_default_count": 6101, "default_rate": 0.2988968053321075}, {"dimension": "cb_person_default_on_file", "segment": "N", "count": 49943, "default_count": 5749, "non_default_count": 44194, "default_rate": 0.1151112267985503}], "bins": [{"feature": "loan_percent_income", "bucket_order": 1, "bucket": "(-inf, 0.05]", "count": 5518, "default_count": 330, "default_rate": 0.0598042769119246}, {"feature": "loan_percent_income", "bucket_order": 2, "bucket": "(0.05, 0.1]", "count": 13887, "default_count": 966, "default_rate": 0.0695614603586087}, {"feature": "loan_percent_income", "bucket_order": 3, "bucket": "(0.1, 0.15]", "count": 13318, "default_count": 1067, "default_rate": 0.0801171347049106}, {"feature": "loan_percent_income", "bucket_order": 4, "bucket": "(0.15, 0.2]", "count": 10449, "default_count": 1116, "default_rate": 0.1068044788975021}, {"feature": "loan_percent_income", "bucket_order": 5, "bucket": "(0.2, 0.25]", "count": 6775, "default_count": 824, "default_rate": 0.1216236162361623}, {"feature": "loan_percent_income", "bucket_order": 6, "bucket": "(0.25, 0.3]", "count": 3968, "default_count": 752, "default_rate": 0.189516129032258}, {"feature": "loan_percent_income", "bucket_order": 7, "bucket": "(0.3, 0.35]", "count": 2478, "default_count": 1665, "default_rate": 0.6719128329297821}, {"feature": "loan_percent_income", "bucket_order": 8, "bucket": "(0.35, 0.4]", "count": 1366, "default_count": 955, "default_rate": 0.6991215226939971}, {"feature": "loan_percent_income", "bucket_order": 9, "bucket": "(0.4, 0.5]", "count": 847, "default_count": 650, "default_rate": 0.7674144037780402}, {"feature": "loan_percent_income", "bucket_order": 10, "bucket": "(0.5, inf]", "count": 39, "default_count": 25, "default_rate": 0.6410256410256411}, {"feature": "loan_int_rate", "bucket_order": 1, "bucket": "(-inf, 7.0]", "count": 7450, "default_count": 278, "default_rate": 0.0373154362416107}, {"feature": "loan_int_rate", "bucket_order": 2, "bucket": "(11.0, 13.0]", "count": 12170, "default_count": 1486, "default_rate": 0.1221035332785538}, {"feature": "loan_int_rate", "bucket_order": 3, "bucket": "(13.0, 15.0]", "count": 9672, "default_count": 2249, "default_rate": 0.2325268817204301}, {"feature": "loan_int_rate", "bucket_order": 4, "bucket": "(15.0, 17.0]", "count": 3872, "default_count": 2074, "default_rate": 0.5356404958677686}, {"feature": "loan_int_rate", "bucket_order": 5, "bucket": "(17.0, 20.0]", "count": 766, "default_count": 475, "default_rate": 0.6201044386422977}, {"feature": "loan_int_rate", "bucket_order": 6, "bucket": "(20.0, inf]", "count": 49, "default_count": 36, "default_rate": 0.7346938775510204}, {"feature": "loan_int_rate", "bucket_order": 7, "bucket": "(7.0, 9.0]", "count": 12908, "default_count": 729, "default_rate": 0.056476603656647}, {"feature": "loan_int_rate", "bucket_order": 8, "bucket": "(9.0, 11.0]", "count": 11758, "default_count": 1023, "default_rate": 0.0870045926177921}, {"feature": "person_income", "bucket_order": 1, "bucket": "(-inf, 30000.0]", "count": 5664, "default_count": 1898, "default_rate": 0.3350988700564972}, {"feature": "person_income", "bucket_order": 2, "bucket": "(100000.0, 150000.0]", "count": 4936, "default_count": 192, "default_rate": 0.0388978930307941}, {"feature": "person_income", "bucket_order": 3, "bucket": "(150000.0, inf]", "count": 880, "default_count": 29, "default_rate": 0.0329545454545454}, {"feature": "person_income", "bucket_order": 4, "bucket": "(30000.0, 45000.0]", "count": 12472, "default_count": 2654, "default_rate": 0.2127966645285439}, {"feature": "person_income", "bucket_order": 5, "bucket": "(45000.0, 60000.0]", "count": 15987, "default_count": 1990, "default_rate": 0.1244761368611997}, {"feature": "person_income", "bucket_order": 6, "bucket": "(60000.0, 80000.0]", "count": 12314, "default_count": 1242, "default_rate": 0.1008608088354718}, {"feature": "person_income", "bucket_order": 7, "bucket": "(80000.0, 100000.0]", "count": 6392, "default_count": 345, "default_rate": 0.053973717146433}, {"feature": "person_emp_length", "bucket_order": 1, "bucket": "(-inf, 1.0]", "count": 12789, "default_count": 2630, "default_rate": 0.2056454765814371}, {"feature": "person_emp_length", "bucket_order": 2, "bucket": "(1.0, 3.0]", "count": 13745, "default_count": 2255, "default_rate": 0.1640596580574754}, {"feature": "person_emp_length", "bucket_order": 3, "bucket": "(10.0, 15.0]", "count": 4350, "default_count": 348, "default_rate": 0.08}, {"feature": "person_emp_length", "bucket_order": 4, "bucket": "(15.0, inf]", "count": 907, "default_count": 101, "default_rate": 0.1113561190738699}, {"feature": "person_emp_length", "bucket_order": 5, "bucket": "(3.0, 5.0]", "count": 11300, "default_count": 1349, "default_rate": 0.1193805309734513}, {"feature": "person_emp_length", "bucket_order": 6, "bucket": "(5.0, 7.0]", "count": 9177, "default_count": 1043, "default_rate": 0.1136536994660564}, {"feature": "person_emp_length", "bucket_order": 7, "bucket": "(7.0, 10.0]", "count": 6377, "default_count": 624, "default_rate": 0.0978516543829386}], "models": [{"model": "Gradient Boosting", "cv_roc_auc_mean": 0.9518800487671536, "cv_roc_auc_std": 0.0037568960248454, "cv_pr_auc_mean": 0.8676853636499089, "cv_pr_auc_std": 0.0050854912772635, "cv_f1_mean": 0.8111442315207862, "cv_recall_mean": 0.7179640718562874, "cv_precision_mean": 0.9321839818394644}, {"model": "Random Forest", "cv_roc_auc_mean": 0.937120050448524, "cv_roc_auc_std": 0.0020705030718797, "cv_pr_auc_mean": 0.8403489007332808, "cv_pr_auc_std": 0.0047166845647492, "cv_f1_mean": 0.7683333824026876, "cv_recall_mean": 0.7637724550898203, "cv_precision_mean": 0.7731256681458396}, {"model": "Logistic Regression", "cv_roc_auc_mean": 0.9029967143152134, "cv_roc_auc_std": 0.0035250293047354, "cv_pr_auc_mean": 0.6961254817359012, "cv_pr_auc_std": 0.008678489551215, "cv_f1_mean": 0.5949768927005047, "cv_recall_mean": 0.8191616766467066, "cv_precision_mean": 0.4671721791656154}], "final": [{"stage": "OOF threshold tuning", "model": "Gradient Boosting", "threshold": 0.4168485736909781, "precision": 0.9166041979010496, "recall": 0.7321856287425149, "f1": 0.814081225033289, "tn": 39791, "fp": 445, "fn": 1789, "tp": 4891, "roc_auc": NaN, "pr_auc": NaN, "accuracy": NaN}, {"stage": "Final holdout test", "model": "Gradient Boosting", "threshold": 0.4168485736909781, "precision": 0.9080717488789236, "recall": 0.7275449101796407, "f1": 0.807845744680851, "tn": 9936, "fp": 123, "fn": 455, "tp": 1215, "roc_auc": 0.9538018505190632, "pr_auc": 0.8720887394369341, "accuracy": 0.9507204365248528}], "importance": [{"feature": "loan_percent_income", "importance": 0.0785176255005646, "importance_std": 0.0017874950959274}, {"feature": "loan_int_rate", "importance": 0.0557532080187969, "importance_std": 0.002474047406159}, {"feature": "person_home_ownership", "importance": 0.0513736395386977, "importance_std": 0.0029511024515148}, {"feature": "person_income", "importance": 0.0498936216442748, "importance_std": 0.0019941252716897}, {"feature": "loan_intent", "importance": 0.0287751889599864, "importance_std": 0.0016983890769058}, {"feature": "loan_grade", "importance": 0.0125656121398717, "importance_std": 0.0011544086956652}, {"feature": "person_age", "importance": 0.0052536553793695, "importance_std": 0.0005426027953907}, {"feature": "person_emp_length", "importance": 0.0038291855001598, "importance_std": 0.0004049757330026}, {"feature": "loan_amnt", "importance": 0.0016042512350782, "importance_std": 0.0006105066624874}, {"feature": "cb_person_default_on_file", "importance": 0.0001292077342481, "importance_std": 5.264714037007121e-05}, {"feature": "cb_person_cred_hist_length", "importance": -0.0001704985495754, "importance_std": 0.0002600894519794}]};
+    const fmtPct = v => `${(v * 100).toFixed(1)}%`;
+    const fmt3 = v => Number(v).toFixed(3);
+    const nice = s => String(s).replaceAll("_", " ");
+
+    function barRows(el, rows, valueKey, labelKey, opts = {}) {
+      const max = opts.max ?? Math.max(...rows.map(d => Math.abs(Number(d[valueKey]))));
+      el.innerHTML = rows.map(d => {
+        const raw = Number(d[valueKey]);
+        const width = Math.max(1, Math.abs(raw) / max * 100);
+        const color = opts.color || (raw < 0 ? "green" : "blue");
+        const val = opts.percent ? fmtPct(raw) : fmt3(raw);
+        return `<div class="bar-row">
+          <div class="label" title="${d[labelKey]}">${nice(d[labelKey])}</div>
+          <div class="track"><div class="bar ${color}" style="width:${width}%"></div></div>
+          <div class="value">${val}</div>
+        </div>`;
+      }).join("");
+    }
+
+    function renderKpis() {
+      const wanted = ["Records analyzed", "Observed default rate", "Selected model", "Test ROC-AUC", "Test PR-AUC", "Tuned test F1"];
+      const rows = DATA.overview.filter(d => wanted.includes(d.metric));
+      document.getElementById("kpis").innerHTML = rows.map(d => `<div class="card">
+        <div class="kpi-value">${d.display_value}</div>
+        <div class="kpi-label">${d.metric}</div>
+        <div class="kpi-section">${d.section}</div>
+      </div>`).join("");
+    }
+
+    function renderTarget() {
+      barRows(document.getElementById("targetChart"), DATA.target, "share", "loan_status_label", {percent:true, color:"blue", max:1});
+    }
+
+    function renderCorrelations() {
+      const rows = DATA.correlations.slice(0, 6);
+      barRows(document.getElementById("corrChart"), rows, "correlation_to_default", "feature");
+    }
+
+    function renderSegments(active = "loan_grade") {
+      const dims = [...new Set(DATA.segments.map(d => d.dimension))];
+      const tabs = document.getElementById("segmentTabs");
+      tabs.innerHTML = dims.map(d => `<button class="${d === active ? "active" : ""}" onclick="renderSegments('${d}')">${nice(d)}</button>`).join("");
+      const rows = DATA.segments.filter(d => d.dimension === active).sort((a, b) => b.default_rate - a.default_rate);
+      barRows(document.getElementById("segmentChart"), rows, "default_rate", "segment", {percent:true, color:"blue", max: Math.max(...rows.map(d => Number(d.default_rate))) });
+    }
+
+    function renderModels() {
+      const html = DATA.models.map(d => `<div class="model-row">
+        <strong>${d.model}</strong>
+        <div class="dual">
+          <div class="mini-line"><span>ROC-AUC</span><div class="track"><div class="bar" style="width:${Number(d.cv_roc_auc_mean) * 100}%"></div></div><span class="value">${fmt3(d.cv_roc_auc_mean)}</span></div>
+          <div class="mini-line"><span>PR-AUC</span><div class="track"><div class="bar orange" style="width:${Number(d.cv_pr_auc_mean) * 100}%"></div></div><span class="value">${fmt3(d.cv_pr_auc_mean)}</span></div>
+        </div>
+      </div>`).join("");
+      document.getElementById("modelChart").innerHTML = html;
+    }
+
+    function renderImportance() {
+      const rows = DATA.importance.slice(0, 8);
+      barRows(document.getElementById("importanceChart"), rows, "importance", "feature", {color:"blue"});
+    }
+
+    function renderFinal() {
+      const final = DATA.final.find(d => d.stage === "Final holdout test");
+      const cards = [
+        ["Precision", fmtPct(final.precision)],
+        ["Recall", fmtPct(final.recall)],
+        ["F1", fmt3(final.f1)],
+        ["PR-AUC", fmt3(final.pr_auc)]
+      ];
+      document.getElementById("finalKpis").innerHTML = cards.map(([label, value]) => `<div class="card">
+        <div class="kpi-value">${value}</div><div class="kpi-label">${label}</div><div class="kpi-section">Final holdout test</div>
+      </div>`).join("");
+      document.getElementById("finalCallout").textContent = `At the tuned threshold, the model identifies ${Number(final.tp).toLocaleString()} defaults and misses ${Number(final.fn).toLocaleString()}, with ${Number(final.fp).toLocaleString()} false positives.`;
+    }
+
+    renderKpis();
+    renderTarget();
+    renderCorrelations();
+    renderSegments();
+    renderModels();
+    renderImportance();
+    renderFinal();
+  </script>
+</body>
+</html>
